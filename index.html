@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏠 Home Control Switches</title>
+<style>
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Arial', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  margin: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: 500px;
+}
+
+.switch-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.switch {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 30px 20px;
+  border-radius: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 3px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.switch:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.switch.on {
+  background: linear-gradient(135deg, #FFC107, #FF9800);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(255, 152, 0, 0.3);
+  border-color: #FF9800;
+}
+
+.switch.on::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #FF5722;
+  border-radius: 20px 20px 0 0;
+}
+
+.icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
+}
+
+.switch.on .icon {
+  transform: scale(1.1);
+  filter: drop-shadow(2px 2px 6px rgba(0,0,0,0.2));
+}
+
+.name {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.switch.on .name {
+  color: #000;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.status {
+  font-size: 14px;
+  color: #666;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.05);
+  display: inline-block;
+  min-width: 60px;
+  transition: all 0.3s ease;
+}
+
+.switch.on .status {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+}
+
+/* Status Panel */
+.status-panel {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.status-row:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.status-label {
+  color: #666;
+  font-size: 14px;
+}
+
+.status-value {
+  color: #333;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.cooldown-timer {
+  text-align: center;
+  color: #FF9800;
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.loading .status {
+  animation: pulse 1.5s infinite;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .switch-container {
+    gap: 15px;
+  }
+  
+  .switch {
+    padding: 25px 15px;
+  }
+  
+  .icon {
+    font-size: 40px;
+  }
+  
+  .name {
+    font-size: 18px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="switch-container">
+    <!-- Switch 1 - ROOF -->
+    <div class="switch" id="switch1" onclick="toggleSwitch(1)">
+      <div class="icon">💡</div>
+      <div class="name">ROOF</div>
+      <div class="status" id="status1">LOADING...</div>
+    </div>
+    
+    <!-- Switch 2 - DOOR -->
+    <div class="switch" id="switch2" onclick="toggleSwitch(2)">
+      <div class="icon">🚪</div>
+      <div class="name">DOOR</div>
+      <div class="status" id="status2">LOADING...</div>
+    </div>
+    
+    <!-- Switch 3 - charger -->
+    <div class="switch" id="switch3" onclick="toggleSwitch(3)">
+      <div class="icon">📱</div>
+      <div class="name">charger</div>
+      <div class="status" id="status3">LOADING...</div>
+    </div>
+    
+    <!-- Switch 4 socket -->
+    <div class="switch" id="switch4" onclick="toggleSwitch(4)">
+      <div class="icon">🏪</div>
+      <div class="name">socket</div>
+      <div class="status" id="status4">LOADING...</div>
+    </div>
+  </div>
+  
+  <!-- Status Panel -->
+  <div class="status-panel">
+    <div class="status-row">
+      <span class="status-label">System Status:</span>
+      <span id="systemStatus" class="status-value">Initializing...</span>
+    </div>
+    <div class="status-row">
+      <span class="status-label">Last Update:</span>
+      <span id="lastUpdate" class="status-value">--:--:--</span>
+    </div>
+    <div class="status-row">
+      <span class="status-label">Connection:</span>
+      <span id="connectionStatus" class="status-value">Connecting...</span>
+    </div>
+    <div id="cooldownTimer" class="cooldown-timer"></div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// CONFIGURATION
+// ════════════════════════════════════════════════════════════════
+const CONFIG = {
+  channelId: "3044930",
+  readKey: "Z02SIIHAL4CHWFH5",
+  writeKey: "MUS722GJ4HA075ZG",
+  cooldownTime: 15000
+};
+
+// Switch names matching your design
+const SWITCH_NAMES = {
+  1: "ROOF",
+  2: "DOOR", 
+  3: "फोन",
+  4: "मार्केट"
+};
+
+// State management
+let switchStates = {
+  1: false,
+  2: false,
+  3: false,
+  4: false
+};
+
+let cooldownEnd = 0;
+let cooldownInterval = null;
+
+// ════════════════════════════════════════════════════════════════
+// UI FUNCTIONS
+// ════════════════════════════════════════════════════════════════
+function updateSwitchUI(switchId, isOn) {
+  const switchEl = document.getElementById(`switch${switchId}`);
+  const statusEl = document.getElementById(`status${switchId}`);
+  
+  if (isOn) {
+    switchEl.classList.add('on');
+    statusEl.textContent = 'ON';
+    statusEl.style.color = '#fff';
+  } else {
+    switchEl.classList.remove('on');
+    statusEl.textContent = 'OFF';
+    statusEl.style.color = '#666';
+  }
+  
+  // Remove loading animation
+  switchEl.classList.remove('loading');
+  
+  // Update state
+  switchStates[switchId] = isOn;
+}
+
+function updateSystemStatus(message, type = 'info') {
+  const systemStatusEl = document.getElementById('systemStatus');
+  systemStatusEl.textContent = message;
+  
+  const colors = {
+    info: '#4CAF50',
+    warn: '#FF9800',
+    error: '#f44336'
+  };
+  systemStatusEl.style.color = colors[type];
+}
+
+function updateConnectionStatus(isConnected) {
+  const connectionEl = document.getElementById('connectionStatus');
+  if (isConnected) {
+    connectionEl.textContent = 'Connected';
+    connectionEl.style.color = '#4CAF50';
+  } else {
+    connectionEl.textContent = 'Disconnected';
+    connectionEl.style.color = '#f44336';
+  }
+}
+
+function updateLastUpdateTime() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-GB', {
+    hour12: false,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+  document.getElementById('lastUpdate').textContent = timeStr;
+}
+
+function startCooldown() {
+  if (cooldownInterval) clearInterval(cooldownInterval);
+  
+  cooldownEnd = Date.now() + CONFIG.cooldownTime;
+  
+  cooldownInterval = setInterval(() => {
+    const remaining = Math.max(0, Math.ceil((cooldownEnd - Date.now()) / 1000));
+    const cooldownEl = document.getElementById('cooldownTimer');
+    
+    if (remaining > 0) {
+      cooldownEl.textContent = `Cooldown: ${remaining}s`;
+      cooldownEl.style.color = '#FF9800';
+    } else {
+      cooldownEl.textContent = 'Ready to switch';
+      cooldownEl.style.color = '#4CAF50';
+      clearInterval(cooldownInterval);
+    }
+  }, 1000);
+}
+
+// ════════════════════════════════════════════════════════════════
+// THINGSPEAK FUNCTIONS
+// ════════════════════════════════════════════════════════════════
+async function loadSwitchState(switchId) {
+  try {
+    const url = `https://api.thingspeak.com/channels/${CONFIG.channelId}/fields/${switchId}/last.json`;
+    
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const value = data[`field${switchId}`];
+    
+    if (value !== null && value !== undefined) {
+      const isOn = value === "1" || value === 1;
+      updateSwitchUI(switchId, isOn);
+      updateConnectionStatus(true);
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error(`Error loading switch ${switchId}:`, error);
+    updateConnectionStatus(false);
+    return false;
+  }
+}
+
+async function updateSwitchOnThingSpeak(switchId, isOn) {
+  // Check cooldown
+  if (Date.now() < cooldownEnd) {
+    const remaining = Math.ceil((cooldownEnd - Date.now()) / 1000);
+    updateSystemStatus(`Wait ${remaining}s before switching`, 'warn');
+    return false;
+  }
+  
+  try {
+    const value = isOn ? 1 : 0;
+    const url = `https://api.thingspeak.com/update?api_key=${CONFIG.writeKey}&field${switchId}=${value}`;
+    
+    updateSystemStatus(`Updating ${SWITCH_NAMES[switchId]}...`, 'info');
+    
+    const response = await fetch(url);
+    const result = await response.text();
+    
+    if (result === '0') {
+      updateSystemStatus('Rate limit reached! Wait 15s', 'error');
+      return false;
+    }
+    
+    // Update UI
+    updateSwitchUI(switchId, isOn);
+    
+    // Update timestamp
+    updateLastUpdateTime();
+    
+    // Start cooldown
+    startCooldown();
+    
+    updateSystemStatus(`${SWITCH_NAMES[switchId]} updated`, 'info');
+    console.log(`Switch ${switchId} (${SWITCH_NAMES[switchId]}): ${isOn ? 'ON' : 'OFF'} - Entry #${result}`);
+    
+    return true;
+    
+  } catch (error) {
+    console.error(`Error updating switch ${switchId}:`, error);
+    updateSystemStatus('Network error', 'error');
+    updateConnectionStatus(false);
+    return false;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// MAIN FUNCTIONS
+// ════════════════════════════════════════════════════════════════
+async function toggleSwitch(switchId) {
+  const switchEl = document.getElementById(`switch${switchId}`);
+  const currentState = switchStates[switchId];
+  const newState = !currentState;
+  
+  // Add loading animation
+  switchEl.classList.add('loading');
+  
+  // Update on ThingSpeak
+  const success = await updateSwitchOnThingSpeak(switchId, newState);
+  
+  if (!success) {
+    // Revert UI if failed
+    switchEl.classList.remove('loading');
+    updateSwitchUI(switchId, currentState);
+  }
+}
+
+async function initializeSwitches() {
+  updateSystemStatus('Loading switches...', 'info');
+  
+  // Add loading animation to all switches
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`switch${i}`).classList.add('loading');
+  }
+  
+  // Load all switches
+  let loadedCount = 0;
+  for (let i = 1; i <= 4; i++) {
+    const success = await loadSwitchState(i);
+    if (success) loadedCount++;
+    
+    // Small delay between requests
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+  
+  if (loadedCount === 4) {
+    updateSystemStatus('All switches loaded', 'info');
+  } else {
+    updateSystemStatus(`${loadedCount}/4 switches loaded`, 'warn');
+  }
+  
+  // Set initial time
+  updateLastUpdateTime();
+}
+
+// ════════════════════════════════════════════════════════════════
+// INITIALIZATION
+// ════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('Initializing Home Control Switches...');
+  
+  // Initialize switches
+  initializeSwitches();
+  
+  // Auto-refresh every 30 seconds
+  setInterval(async () => {
+    // Refresh one random switch
+    const randomSwitch = Math.floor(Math.random() * 4) + 1;
+    await loadSwitchState(randomSwitch);
+  }, 30000);
+  
+  // Update time every second
+  setInterval(updateLastUpdateTime, 1000);
+});
+</script>
+</body>
+</html>
